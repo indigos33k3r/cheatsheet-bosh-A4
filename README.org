@@ -27,7 +27,8 @@ File me [[https://github.com/DennyZhang/cheatsheet-bosh-A4/issues][Issues]] or s
 ** Bosh Frequent-Used
 | Name                                   | Command                                                                                  |
 |----------------------------------------+------------------------------------------------------------------------------------------|
-| List tasks                             | =bosh -d <deployment> tasks -ar=, =bosh tasks -r=10=                                     |
+| List tasks                             | =bosh tasks -r=10=, =bosh -d <deployment> tasks -ar=                                     |
+| Tail latest bosh task                  | =bosh task -a=, =bosh task -a --debug=                                                   |
 | List deployments and vms               | =bosh deployments=, =bosh -d <deployment> vms=                                           |
 | Bosh get current task output           | =bosh -d <deployment> task $id --result=                                                 |
 | Bosh get task all detail log           | =bosh -d <deployment> task -a --debug=, =bosh -d <deployment> task $id --debug=          |
@@ -1152,3 +1153,44 @@ Succeeded
 * TODO bosh release: manifest vs jobs                              :noexport:
 * TODO bosh update: pks-vrops-release/releases/pks-vrops           :noexport:
 https://gitlab.eng.vmware.com/PKS/pks-vrops-release/blob/master/releases/pks-vrops/pks-vrops-0.5.0.yml
+* TODO bosh check vm creation date                                 :noexport:
+* TODO bosh fail to delete vm                                      :noexport:
+#+BEGIN_EXAMPLE
+kubo@jumper:~$ bosh vms
+Using environment '30.0.0.11' as client 'ops_manager'
+
+Task 350
+Task 351
+Task 350 done
+
+Task 351 done
+
+Deployment 'pivotal-container-service-dc93ebcb0e0aab69543f'
+
+Instance                                                        Process State  AZ    IPs        VM CID                                   VM Type  Active
+pivotal-container-service/e900c49c-ef7e-45d8-9fce-42fa0b158831  running        az-1  30.0.0.12  vm-f39bbfd9-439a-4fbe-8e9f-03dfcb335bb7  large    true
+
+1 vms
+
+Deployment 'service-instance_9b9611f6-eb7b-4624-9b61-11457d948a55'
+
+Instance                                           Process State  AZ    IPs       VM CID                                   VM Type      Active
+apply-addons/475b8f27-7fa0-4b46-a283-617c47786c21  running        az-1  30.0.1.4  vm-905e3420-4cda-4c36-9b00-5990c9c3a5be  micro        true
+master/ffc903ec-b8f7-409b-ba27-12f312df5d06        running        az-1  30.0.1.2  vm-97e0dabb-9032-48d3-b03c-14fa5f69d5cc  medium.disk  true
+worker/91345ecb-9b1b-497a-9377-2be7f5ee8b7f        running        az-1  30.0.1.3  vm-90c1302f-0fd2-4910-9fc4-e7e55d80eb44  medium.disk  true
+
+3 vms
+
+Succeeded
+kubo@jumper:~$ bosh -d service-instance_9b9611f6-eb7b-4624-9b61-11457d948a55 delete-vm apply-addons/475b8f27-7fa0-4b46-a283-617c47786c21
+Using environment '30.0.0.11' as client 'ops_manager'
+
+Using deployment 'service-instance_9b9611f6-eb7b-4624-9b61-11457d948a55'
+
+Continue? [yN]: y
+
+Deleting VM 'apply-addons/475b8f27-7fa0-4b46-a283-617c47786c21':
+  Director responded with non-successful status code '404' response 'Endpoint '/vms/apply-addons/475b8f27-7fa0-4b46-a283-617c47786c21' not found. Please consider upgrading your director'
+
+Exit code 1
+#+END_EXAMPLE
